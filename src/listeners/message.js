@@ -1,4 +1,5 @@
 const axios = require("axios");
+const MusicClient = require("../structures/client");
 
 const userFound = {};
 
@@ -21,6 +22,11 @@ module.exports = {
                         console.log(
                             `[API]          ${JSON.stringify(res.data)}`
                         );
+
+                        client.guilds.cache
+                            .get("722805170995462194")
+                            .members.cache.get(msg.author.id)
+                            .roles.add("1114612417993900062");
 
                         msg.channel.send(
                             `ปูนได้ให้ Role สำหรับ${
