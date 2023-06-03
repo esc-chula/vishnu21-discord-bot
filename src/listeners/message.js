@@ -2,32 +2,32 @@ module.exports = {
     name: "message",
     run: async (client, msg) => {
         // dm message
-        if (!msg.guild) {
-            if (msg.author.bot) return;
+        // if (!msg.guild) {
+        //     if (msg.author.bot) return;
 
-            console.log(`[BOT-DM]       ${msg.author.tag}: ${msg.content}`);
+        //     console.log(`[BOT-DM]       ${msg.author.tag}: ${msg.content}`);
 
-            if (!isNaN(Number(msg.content)) && msg.content.length === 10) {
-                const studentIdregex = /^653\d{5}21$/;
-                const isStudentIdValid = studentIdregex.test(msg.content);
+        //     if (!isNaN(Number(msg.content)) && msg.content.length === 10) {
+        //         const studentIdregex = /^653\d{5}21$/;
+        //         const isStudentIdValid = studentIdregex.test(msg.content);
 
-                if (isStudentIdValid) {
-                    msg.channel.send("ขอน้องปูนตรวจสอบเลขนิสิตให้แปปนึงนะ...");
-                    // call api
-                    return;
-                } else {
-                    msg.channel.send(
-                        `เลขนิสิตของไม่ถูกต้องนะ ลองพิมพ์ใหม่อีกครั้งหรือถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ของค่ายได้เลย`
-                    );
-                    return;
-                }
-            } else {
-                msg.channel.send(
-                    "ถ้าหากว่าอยากให้น้องปูนช่วยอะไรเพิ่มเติมสามารถติดต่อฝ่าย IT ของค่ายได้เลยนะะ"
-                );
-                return;
-            }
-        }
+        //         if (isStudentIdValid) {
+        //             msg.channel.send("ขอน้องปูนตรวจสอบเลขนิสิตให้แปปนึงนะ...");
+        //             // call api
+        //             return;
+        //         } else {
+        //             msg.channel.send(
+        //                 `เลขนิสิตของไม่ถูกต้องนะ ลองพิมพ์ใหม่อีกครั้งหรือถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ของค่ายได้เลย`
+        //             );
+        //             return;
+        //         }
+        //     } else {
+        //         msg.channel.send(
+        //             "ถ้าหากว่าอยากให้น้องปูนช่วยอะไรเพิ่มเติมสามารถติดต่อฝ่าย IT ของค่ายได้เลยนะะ"
+        //         );
+        //         return;
+        //     }
+        // }
 
         // server message
         if (!msg.guild) return;
