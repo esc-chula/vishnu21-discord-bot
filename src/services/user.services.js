@@ -24,6 +24,14 @@ const findByStudentId = async (studentId) => {
     return user;
 };
 
+const findByDiscordId = async (discordId) => {
+    const user = await UserModel.findOne({ discordId })
+        .then((user) => user)
+        .catch(() => null);
+
+    return user;
+};
+
 const update = async (id, user) => {
     const updatedUser = await UserModel.findByIdAndUpdate(id, user, {
         new: true,
@@ -46,6 +54,7 @@ module.exports = {
     create,
     find,
     findByStudentId,
+    findByDiscordId,
     update,
     remove,
 };

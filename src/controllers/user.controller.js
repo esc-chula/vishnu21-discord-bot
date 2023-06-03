@@ -45,6 +45,25 @@ router.get(
     })
 );
 
+router.get(
+    "/discord/:discordId",
+    genericRoute(async (req, res) => {
+        const discordId = req.params.discordId;
+
+        console.log(`[API]          GET /user/discord/${discordId}`);
+
+        const user = await userServices.findByDiscordId(discordId);
+
+        if (!user) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).send({ success: true, user });
+    })
+);
+
 router.post(
     "/",
     validator(userCreateSchema),
