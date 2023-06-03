@@ -1,7 +1,7 @@
 module.exports = {
     name: "ready",
     run: async (client) => {
-        console.log(`[BOT]          ${client.user.tag} is running...`);
+        console.log(`[BOT]          ${client.user.tag} is running`);
         client.user.setPresence({
             status: "online",
             activity: {
