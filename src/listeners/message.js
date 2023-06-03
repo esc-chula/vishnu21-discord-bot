@@ -12,12 +12,32 @@ module.exports = {
             console.log(`[BOT-DM]       ${msg.author.tag}: ${msg.content}`);
 
             if (msg.content === "confirm" && userFound[msg.author.id]) {
-                msg.channel.send(
-                    `ปูนได้ให้ Role สำหรับ${
-                        userFound[msg.author.id].position
-                    } แล้วนะะ\n\nสามารถกลับไปที่ดิสคอร์ดได้เลยค้าบบ`
-                );
+                await axios
+                    .post("http://localhost:7000/user/role", {
+                        studentId: userFound[msg.author.id].studentId,
+                        discordId: msg.author.id,
+                    })
+                    .then((res) => {
+                        console.log(
+                            `[API]          ${JSON.stringify(res.data)}`
+                        );
+
+                        msg.channel.send(
+                            `ปูนได้ให้ Role สำหรับ${
+                                userFound[msg.author.id].position
+                            } แล้วนะะ\n\nสามารถกลับไปที่ดิสคอร์ดได้เลยค้าบบ`
+                        );
+                    })
+                    .catch((err) => {
+                        console.log(`[BOT-DM]       ${err}`);
+
+                        msg.channel.send(
+                            `เกิดข้อผิดพลาดในการเพิ่ม Role \nลองใส่รหัสนิสิตใหม่หรือติดต่อฝ่าย IT ดูนะค้าบบ`
+                        );
+                    });
+
                 delete userFound[msg.author.id];
+
                 return;
             } else if (msg.content === "cancel" && userFound[msg.author.id]) {
                 msg.channel.send(
@@ -34,11 +54,26 @@ module.exports = {
                 const isStudentIdValid = studentIdregex.test(msg.content);
 
                 if (isStudentIdValid) {
+                    const roleGivenUser = await axios
+                        .get(
+                            `http://localhost:7000/user/discord/${msg.author.id}`
+                        )
+                        .then((res) => res.data.user)
+                        .catch((err) => null);
+
+                    if (roleGivenUser) {
+                        msg.channel.send(
+                            `ปูนได้ให้ Role ไปแล้วนะ\nถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ได้เลยนะ`
+                        );
+
+                        return;
+                    }
+
                     msg.channel.send("ขอปูนตรวจสอบเลขนิสิตให้แปปนึงนะ");
 
                     await axios
                         .get(`http://localhost:7000/user/${msg.content}`)
-                        .then((res) => {
+                        .then(async (res) => {
                             console.log(
                                 `[BOT-DM]       Student ID found: ${JSON.stringify(
                                     res.data.user
@@ -46,6 +81,16 @@ module.exports = {
                             );
 
                             userFound[msg.author.id] = res.data.user;
+
+                            if (res.data.user.discordId) {
+                                msg.channel.send(
+                                    `เลขนิสิตนี้ได้ให้ Role ไปแล้วนะ\nถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ได้เลยนะ`
+                                );
+
+                                delete userFound[msg.author.id];
+
+                                return;
+                            }
 
                             msg.channel.send(
                                 `ข้อมูลที่ปูนเจอจากเลขนิสิตของเพื่อนคือ\n\nชื่อ: ${
