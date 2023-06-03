@@ -12,6 +12,8 @@ const router = express.Router();
 router.get(
     "/",
     genericRoute(async (req, res) => {
+        console.log("[API]          GET /user");
+
         const users = await userServices.find();
 
         if (!users) {
@@ -29,6 +31,8 @@ router.get(
     genericRoute(async (req, res) => {
         const studentId = req.params.studentId;
 
+        console.log(`[API]          GET /user/${studentId}`);
+
         const user = await userServices.findByStudentId(studentId);
 
         if (!user) {
@@ -45,6 +49,8 @@ router.post(
     "/",
     validator(userCreateSchema),
     genericRoute(async (req, res) => {
+        console.log("[API]          POST /user");
+
         const user = await userServices.create(req.body);
 
         if (!user) {
@@ -57,11 +63,42 @@ router.post(
     })
 );
 
+router.post(
+    "/role",
+    genericRoute(async (req, res) => {
+        const { studentId, discordId } = req.body;
+
+        console.log(`[API]          POST /user/role/${studentId}`);
+
+        const user = await userServices.findByStudentId(studentId);
+
+        if (!user) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        const updatedUser = await userServices.update(user._id, {
+            discordId,
+        });
+
+        if (!updatedUser) {
+            return res
+                .status(500)
+                .send({ success: false, message: "User not updated" });
+        }
+
+        return res.status(200).send({ success: true, updatedUser });
+    })
+);
+
 router.put(
     "/:studentId",
     validator(userUpdateSchema),
     genericRoute(async (req, res) => {
         const studentId = req.params.studentId;
+
+        console.log(`[API]          PUT /user/${studentId}`);
 
         const user = await userServices.findByStudentId(studentId);
 
@@ -87,6 +124,8 @@ router.delete(
     "/:studentId",
     genericRoute(async (req, res) => {
         const studentId = req.params.studentId;
+
+        console.log(`[API]          DELETE /user/${studentId}`);
 
         const user = await userServices.findByStudentId(studentId);
 

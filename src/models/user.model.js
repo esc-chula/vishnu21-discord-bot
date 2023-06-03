@@ -8,6 +8,7 @@ const UserSchema = new Schema({
     nickName: String,
     group: String,
     studentId: String,
+    discordId: String,
 });
 
 const UserModel = mongoose.model("User", UserSchema);
