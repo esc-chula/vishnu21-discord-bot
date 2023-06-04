@@ -6,12 +6,6 @@ const userFound = {};
 module.exports = {
     name: "message",
     run: async (client, msg) => {
-        console.log(
-            client.guilds.cache
-                .get("722805170995462194")
-                .members.cache.get(msg.author.id)
-        );
-
         // dm message
         if (!msg.guild) {
             if (msg.author.bot) return;
@@ -30,14 +24,15 @@ module.exports = {
                         );
 
                         try {
+                            const member = await client.guilds.cache
+                                .get(process.env.SERVER_ID)
+                                .members.fetch(msg.author.id);
+
                             const rolesMap =
                                 roleMap[userFound[msg.author.id].position];
 
                             rolesMap.forEach((role) => {
-                                client.guilds.cache
-                                    .get("722805170995462194")
-                                    .members.cache.get(msg.author.id)
-                                    .roles.add(role);
+                                member.roles.add(role);
                             });
 
                             msg.channel.send(
@@ -107,7 +102,7 @@ module.exports = {
 
                     if (roleGivenUser) {
                         msg.channel.send(
-                            `ปูนได้ให้ Role ไปแล้วนะ\nถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ได้เลยนะ`
+                            `ปูนได้ให้ Role กับเพื่อนไปแล้วนะ\nถ้าหากติดปัญหาอะไรติดต่อฝ่าย IT ได้เลยนะ`
                         );
 
                         return;
