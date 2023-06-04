@@ -1,11 +1,17 @@
 const axios = require("axios");
-const MusicClient = require("../structures/client");
+const roleMap = require("../constants/role.json");
 
 const userFound = {};
 
 module.exports = {
     name: "message",
     run: async (client, msg) => {
+        console.log(
+            client.guilds.cache
+                .get("722805170995462194")
+                .members.cache.get(msg.author.id)
+        );
+
         // dm message
         if (!msg.guild) {
             if (msg.author.bot) return;
@@ -18,23 +24,55 @@ module.exports = {
                         studentId: userFound[msg.author.id].studentId,
                         discordId: msg.author.id,
                     })
-                    .then((res) => {
+                    .then(async (res) => {
                         console.log(
                             `[API]          ${JSON.stringify(res.data)}`
                         );
 
-                        client.guilds.cache
-                            .get("722805170995462194")
-                            .members.cache.get(msg.author.id)
-                            .roles.add("1114612417993900062");
+                        try {
+                            const rolesMap =
+                                roleMap[userFound[msg.author.id].position];
 
-                        msg.channel.send(
-                            `ปูนได้ให้ Role สำหรับ${
-                                userFound[msg.author.id].position
-                            } แล้วนะะ\n\nสามารถกลับไปที่ดิสคอร์ดได้เลยค้าบบ`
-                        );
+                            rolesMap.forEach((role) => {
+                                client.guilds.cache
+                                    .get("722805170995462194")
+                                    .members.cache.get(msg.author.id)
+                                    .roles.add(role);
+                            });
+
+                            msg.channel.send(
+                                `ปูนได้ให้ Role สำหรับ${
+                                    userFound[msg.author.id].position
+                                } แล้วนะะ\n\nสามารถกลับไปที่ดิสคอร์ดได้เลยค้าบบ`
+                            );
+                        } catch (error) {
+                            console.log(`[BOT-DM]       ${error}`);
+
+                            await axios
+                                .post(
+                                    `http://localhost:7000/user/discord/${msg.author.id}/unlink`
+                                )
+                                .then((res) => {
+                                    console.log(
+                                        `[API]          ${JSON.stringify(
+                                            res.data
+                                        )}`
+                                    );
+                                })
+                                .catch((err) => {
+                                    console.log(
+                                        `[API]          ${JSON.stringify(
+                                            err.response.data
+                                        )}`
+                                    );
+                                });
+
+                            msg.channel.send(
+                                `เกิดข้อผิดพลาดในการเพิ่ม Role \nลองใส่รหัสนิสิตใหม่หรือติดต่อฝ่าย IT ดูนะค้าบบ`
+                            );
+                        }
                     })
-                    .catch((err) => {
+                    .catch(async (err) => {
                         console.log(`[BOT-DM]       ${err}`);
 
                         msg.channel.send(

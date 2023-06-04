@@ -87,9 +87,11 @@ router.get(
                 );
 
                 if (!userExists) {
-                    await userServices.create(user).then((createdUser) => {
-                        createdUsers.push(createdUser);
-                    });
+                    await userServices
+                        .create({ ...user, discordId: null })
+                        .then((createdUser) => {
+                            createdUsers.push(createdUser);
+                        });
                 }
             })
         );
@@ -137,6 +139,35 @@ router.get(
 );
 
 router.post(
+    "/discord/:discordId/unlink",
+    genericRoute(async (req, res) => {
+        const discordId = req.params.discordId;
+
+        console.log(`[API]          POST /user/discord/${discordId}/unlink`);
+
+        const user = await userServices.findByDiscordId(discordId);
+
+        if (!user) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        const updatedUser = await userServices.update(user._id, {
+            discordId: null,
+        });
+
+        if (!updatedUser) {
+            return res
+                .status(500)
+                .send({ success: false, message: "User not updated" });
+        }
+
+        return res.status(200).send({ success: true, user: updatedUser });
+    })
+);
+
+router.post(
     "/",
     validator(userCreateSchema),
     genericRoute(async (req, res) => {
@@ -152,7 +183,10 @@ router.post(
                 .send({ success: false, message: "User already exists" });
         }
 
-        const user = await userServices.create(req.body);
+        const user = await userServices.create({
+            ...req.body,
+            discordId: null,
+        });
 
         if (!user) {
             return res

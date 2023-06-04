@@ -73,8 +73,18 @@ module.exports = class MusicClient extends Client {
     async loadEventListeners() {
         const listeners = await readdir(join(__dirname, "..", "listeners"));
         for (const listenerFile of listeners) {
+            // if (listenerFile === "message.js") continue;
             const listener = require(`../listeners/${listenerFile}`);
             this.on(listener.name, (...args) => listener.run(this, ...args));
         }
+        // this.on("message", (message) => {
+        //     if (!message.guild) {
+        //         if (message.author.bot) return;
+        //         this.guilds.cache
+        //             .get("722805170995462194")
+        //             .members.cache.get(message.author.id)
+        //             .roles.add("1114612417993900062");
+        //     }
+        // });
     }
 };
