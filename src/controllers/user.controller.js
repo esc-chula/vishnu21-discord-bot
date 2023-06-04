@@ -26,12 +26,16 @@ router.get(
     })
 );
 
-router.get(
+router.post(
     "/sheets",
     genericRoute(async (req, res) => {
-        console.log("[API]          GET /sheets");
+        console.log("[API]          POST /sheets");
 
-        const users = await userServices.getSheetsData("01 ฝ่ายอำนวยการ 1");
+        const { sheetName } = req.body;
+
+        const users = await userServices.getSheetsData(sheetName);
+
+        const filteredUsers = users.filter((user) => user.studentId);
 
         if (!users) {
             return res
@@ -39,7 +43,58 @@ router.get(
                 .send({ success: false, message: "User not found" });
         }
 
-        return res.status(200).send({ success: true, users });
+        return res.status(200).send({ success: true, filteredUsers });
+    })
+);
+
+router.get(
+    "/sheets/register",
+    genericRoute(async (req, res) => {
+        console.log("[API]          POST /sheets/register");
+
+        const sheetNames = [
+            "00 ส่วนกลาง",
+            "01 ฝ่ายอำนวยการ 1",
+            "02 ฝ่ายอำนวยการ 2",
+            "03 ฝ่ายกิจกรรม",
+            "04 ฝ่ายดำเนินการ",
+        ];
+
+        const users = await Promise.all(
+            sheetNames.map(async (sheetName) => {
+                const users = await userServices.getSheetsData(sheetName);
+
+                const filteredUsers = users.filter((user) => user.studentId);
+
+                return filteredUsers;
+            })
+        );
+
+        const filteredUsers = users.flat();
+
+        if (!users) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        const createdUsers = [];
+
+        await Promise.all(
+            filteredUsers.map(async (user) => {
+                const userExists = await userServices.findByStudentId(
+                    user.studentId
+                );
+
+                if (!userExists) {
+                    await userServices.create(user).then((createdUser) => {
+                        createdUsers.push(createdUser);
+                    });
+                }
+            })
+        );
+
+        return res.status(200).send({ success: true, createdUsers });
     })
 );
 
@@ -86,6 +141,16 @@ router.post(
     validator(userCreateSchema),
     genericRoute(async (req, res) => {
         console.log("[API]          POST /user");
+
+        const { studentId } = req.body;
+
+        const userExists = await userServices.findByStudentId(studentId);
+
+        if (userExists) {
+            return res
+                .status(400)
+                .send({ success: false, message: "User already exists" });
+        }
 
         const user = await userServices.create(req.body);
 
