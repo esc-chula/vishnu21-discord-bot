@@ -14,7 +14,7 @@ module.exports = {
 
             if (msg.content === "confirm" && userFound[msg.author.id]) {
                 await axios
-                    .post("http://localhost:7000/user/role", {
+                    .post("http://localhost:7000/user/discord/link", {
                         studentId: userFound[msg.author.id].studentId,
                         discordId: msg.author.id,
                     })
@@ -45,7 +45,10 @@ module.exports = {
 
                             await axios
                                 .post(
-                                    `http://localhost:7000/user/discord/${msg.author.id}/unlink`
+                                    `http://localhost:7000/user/discord/unlink`,
+                                    {
+                                        discordId: msg.author.id,
+                                    }
                                 )
                                 .then((res) => {
                                     console.log(

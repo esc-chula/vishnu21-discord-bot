@@ -26,31 +26,10 @@ router.get(
     })
 );
 
-router.post(
+router.get(
     "/sheets",
     genericRoute(async (req, res) => {
-        console.log("[API]          POST /sheets");
-
-        const { sheetName } = req.body;
-
-        const users = await userServices.getSheetsData(sheetName);
-
-        const filteredUsers = users.filter((user) => user.studentId);
-
-        if (!users) {
-            return res
-                .status(404)
-                .send({ success: false, message: "User not found" });
-        }
-
-        return res.status(200).send({ success: true, filteredUsers });
-    })
-);
-
-router.get(
-    "/sheets/register",
-    genericRoute(async (req, res) => {
-        console.log("[API]          POST /sheets/register");
+        console.log("[API]          GET /user/sheets");
 
         const sheetNames = [
             "00 ส่วนกลาง",
@@ -70,13 +49,48 @@ router.get(
             })
         );
 
+        if (!users) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
         const filteredUsers = users.flat();
+
+        return res.status(200).send({ success: true, filteredUsers });
+    })
+);
+
+router.post(
+    "/sheets/register",
+    genericRoute(async (req, res) => {
+        console.log("[API]          POST /user/sheets/register");
+
+        const sheetNames = [
+            "00 ส่วนกลาง",
+            "01 ฝ่ายอำนวยการ 1",
+            "02 ฝ่ายอำนวยการ 2",
+            "03 ฝ่ายกิจกรรม",
+            "04 ฝ่ายดำเนินการ",
+        ];
+
+        const users = await Promise.all(
+            sheetNames.map(async (sheetName) => {
+                const users = await userServices.getSheetsData(sheetName);
+
+                const filteredUsers = users.filter((user) => user.studentId);
+
+                return filteredUsers;
+            })
+        );
 
         if (!users) {
             return res
                 .status(404)
                 .send({ success: false, message: "User not found" });
         }
+
+        const filteredUsers = users.flat();
 
         const createdUsers = [];
 
@@ -139,11 +153,11 @@ router.get(
 );
 
 router.post(
-    "/discord/:discordId/unlink",
+    "/discord/unlink",
     genericRoute(async (req, res) => {
-        const discordId = req.params.discordId;
+        const { discordId } = req.body;
 
-        console.log(`[API]          POST /user/discord/${discordId}/unlink`);
+        console.log(`[API]          POST /user/discord/unlink`);
 
         const user = await userServices.findByDiscordId(discordId);
 
@@ -199,11 +213,11 @@ router.post(
 );
 
 router.post(
-    "/role",
+    "/discord/link",
     genericRoute(async (req, res) => {
         const { studentId, discordId } = req.body;
 
-        console.log(`[API]          POST /user/role/${studentId}`);
+        console.log(`[API]          POST /user/discord/link`);
 
         const user = await userServices.findByStudentId(studentId);
 
