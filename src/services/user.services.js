@@ -2,8 +2,7 @@ const axios = require("axios");
 const UserModel = require("../models/user.model");
 
 const getSheetsData = async (sheetName) => {
-    const scriptUrl =
-        "https://script.google.com/macros/s/AKfycbxAXXvdATN0DqNAerROb3IX1-MRrm2qO8RdzDBBq1IyK3dEQyUuKwCkpc3B6FBAyu6y4A/exec";
+    const scriptUrl = process.env.SHEETS_SCRIPT_URL;
 
     const sheetData = axios
         .post(`${scriptUrl}?action=getUsers`, {
