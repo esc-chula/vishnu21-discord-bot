@@ -1,4 +1,19 @@
+const axios = require("axios");
 const UserModel = require("../models/user.model");
+
+const getSheetsData = async (sheetName) => {
+    const scriptUrl =
+        "https://script.google.com/macros/s/AKfycbxAXXvdATN0DqNAerROb3IX1-MRrm2qO8RdzDBBq1IyK3dEQyUuKwCkpc3B6FBAyu6y4A/exec";
+
+    const sheetData = axios
+        .post(`${scriptUrl}?action=getUsers`, {
+            sheetName,
+        })
+        .then((sheetData) => sheetData.data)
+        .catch(() => null);
+
+    return sheetData;
+};
 
 const create = async (user) => {
     const createdUser = await UserModel.create(user)
@@ -51,6 +66,7 @@ const remove = async (id) => {
 };
 
 module.exports = {
+    getSheetsData,
     create,
     find,
     findByStudentId,

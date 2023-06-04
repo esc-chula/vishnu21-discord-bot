@@ -27,6 +27,23 @@ router.get(
 );
 
 router.get(
+    "/sheets",
+    genericRoute(async (req, res) => {
+        console.log("[API]          GET /sheets");
+
+        const users = await userServices.getSheetsData("01 ฝ่ายอำนวยการ 1");
+
+        if (!users) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        return res.status(200).send({ success: true, users });
+    })
+);
+
+router.get(
     "/:studentId",
     genericRoute(async (req, res) => {
         const studentId = req.params.studentId;
