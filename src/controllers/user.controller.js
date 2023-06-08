@@ -6,6 +6,7 @@ const {
     userUpdateSchema,
 } = require("../schemas/user.schema");
 const userServices = require("../services/user.services");
+const roleMap = require("../constants/role.json");
 
 const router = express.Router();
 
@@ -111,6 +112,53 @@ router.post(
         );
 
         return res.status(200).send({ success: true, createdUsers });
+    })
+);
+
+router.get(
+    "/sheets/check",
+    genericRoute(async (req, res) => {
+        console.log("[API]          GET /user/sheets/check");
+
+        const sheetNames = [
+            "00 ส่วนกลาง",
+            "01 ฝ่ายอำนวยการ 1",
+            "02 ฝ่ายอำนวยการ 2",
+            "03 ฝ่ายกิจกรรม",
+            "04 ฝ่ายดำเนินการ",
+        ];
+
+        const users = await Promise.all(
+            sheetNames.map(async (sheetName) => {
+                const users = await userServices.getSheetsData(sheetName);
+
+                const filteredUsers = users.filter((user) => user.studentId);
+
+                return filteredUsers;
+            })
+        );
+
+        if (!users) {
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        }
+
+        const filteredUsers = users.flat();
+
+        const inValidUsers = [];
+
+        filteredUsers.forEach((user) => {
+            const roleId = roleMap[user.position];
+
+            // console.log(roleId);
+
+            if (!roleId) {
+                inValidUsers.push(user);
+            }
+        });
+
+        return res.status(200).send({ success: true, inValidUsers });
     })
 );
 
