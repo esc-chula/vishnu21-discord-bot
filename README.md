@@ -26,7 +26,8 @@ Discord bot (น้องปูน) for the Vishnu 21st Discord server.
 | `POST /user/discord/link`      | Link `discordId` to user data                    | `studentId`, `discordId`                                              |
 | `POST /user/discord/unlink`    | Remove `discordId` from user data                | `discordId`                                                           |
 | `GET /user/sheets`             | Get user data from Google Sheets                 |                                                                       |
-| `POST /user/sheets/register`   | Get user data and register it from Google Sheets |
+| `POST /user/sheets/register`   | Get user data and register it from Google Sheets |                                                                       |
+| `GET /user/sheets/check`       | Check if user position is valid to Discord role  |                                                                       |
 
 Yes, I'm too lazy for Swagger ;)
 
