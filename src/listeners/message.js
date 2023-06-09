@@ -12,7 +12,10 @@ module.exports = {
 
             console.log(`[BOT-DM]       ${msg.author.tag}: ${msg.content}`);
 
-            if (msg.content === "confirm" && userFound[msg.author.id]) {
+            if (
+                msg.content.toLowerCase() === "confirm" &&
+                userFound[msg.author.id]
+            ) {
                 await axios
                     .post("http://localhost:7000/user/discord/link", {
                         studentId: userFound[msg.author.id].studentId,
