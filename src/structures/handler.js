@@ -5,7 +5,7 @@ const prettyMilliseconds = require("pretty-ms");
 module.exports = class Handler {
     constructor(guild) {
         this.guild = guild;
-        this.volume = 30;
+        this.volume = process.env.VOLUME;
         this.loop = 0; // 0 = none; 1 = track; 2 = queue;
         this.previous = null;
         this.current = null;
@@ -33,7 +33,7 @@ module.exports = class Handler {
 
     reset() {
         this.loop = 0;
-        this.volume = 30;
+        this.volume = process.env.VOLUME;
         this.previous = null;
         this.current = null;
         this.queue = [];
@@ -55,6 +55,10 @@ module.exports = class Handler {
             .on("start", () => {
                 this.current = this.queue.shift();
                 const track = this.current;
+
+                // set volume
+                this.player.volume(this.volume);
+
                 if (this.textChannel)
                     this.textChannel.send(
                         util
